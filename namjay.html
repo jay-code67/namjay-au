@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Namjay Alternative Universe - iPhone Mode</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #090d16;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+    }
+
+    /* Tampilan Bodi iPhone */
+    .iphone-frame {
+      width: 100%;
+      max-width: 375px;
+      height: 100%;
+      max-height: 760px;
+      background-size: cover;
+      background-position: center;
+      border-radius: 48px;
+      border: 10px solid #C0C0C0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    /* Dynamic Island Real iPhone (Clean & Flat, No Blur/Shadow) */
+    .dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 30px;
+      background-color: #000000;
+      border-radius: 20px;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      box-shadow: none !important;
+      border: none !important;
+      outline: none !important;
+    }
+
+    .camera-lens {
+      width: 10px;
+      height: 10px;
+      background-color: #111;
+      border-radius: 50%;
+      border: 1px solid #222;
+    }
+
+    .sensor-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #0d0d1a;
+      border-radius: 50%;
+    }
+
+    /* Status Bar Kunci Presisi */
+    .status-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 45px;
+      z-index: 998;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    .status-bar > span {
+      position: absolute;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      line-height: 1;
+    }
+
+    .status-icons {
+      position: absolute;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      height: 22px;
+    }
+
+    .status-icons img {
+      height: 22px;
+      width: auto;
+      display: block;
+    }
+
+    .screen-content {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: url('download.png') center/cover no-repeat;
+      margin-top: 50px;
+      height: calc(100% - 50px);
+    }
+
+    .view {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: none;
+      flex-direction: column;
+      box-sizing: border-box;
+      padding: 15px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(3px);
+    }
+
+    .view.active {
+      display: flex;
+    }
+
+    /* --- LOCKSCREEN VIEW --- */
+    #lock-screen {
+      background: url('download.png') center/cover no-repeat;
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      padding: 60px 20px 40px 20px;
+      z-index: 1000;
+    }
+
+    .lock-widget h1 { font-size: 54px; margin: 0; font-weight: 300; }
+    .lock-widget h2 { font-size: 14px; margin: 0; font-weight: 400; color: rgba(255,255,255,0.9); }
+
+    .passcode-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+    }
+
+    .passcode-dots {
+      display: flex;
+      gap: 15px;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.8);
+      border-radius: 50%;
+      background: transparent;
+      transition: 0.2s;
+    }
+
+    .dot.filled {
+      background: #fff;
+    }
+
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .num-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: white;
+      font-size: 24px;
+      font-weight: 500;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .num-btn:active {
+      background: rgba(255,255,255,0.4);
+    }
+
+    /* Home Screen iOS */
+    #home-screen {
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      background: none;
+      padding: 20px;
+    }
+
+    .ios-widget {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 14px 28px;
+      border-radius: 24px;
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .ios-widget h1 { font-size: 46px; margin: 0; font-weight: 300; letter-spacing: -1px; }
+    .ios-widget h2 { font-size: 13px; margin: 0; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.8); }
+
+    /* Grid Aplikasi iOS */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      width: 100%;
+      margin-bottom: 25px;
+    }
+
+    .app-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .icon-box {
+      width: 58px; 
+      height: 58px;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      background: #222;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .icon-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Header Aplikasi General */
+    .app-header {
+      display: flex;
+      align-items: center;
+      background: rgba(30, 30, 30, 0.75);
+      padding: 12px 15px;
+      border-radius: 16px;
+      margin-bottom: 15px;
+      font-weight: 600;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .app-header button {
+      background: none; border: none; color: #0a84ff; font-size: 17px; cursor: pointer; margin-right: 10px; font-weight: 500;
+    }
+
+    /* Tampilan Instagram Feed & Story */
+    #instagram-screen {
+      padding: 0;
+      background: #000;
+      backdrop-filter: none;
+    }
+
+    .ig-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid #1c1c1e;
+      background: #000;
+    }
+
+    .ig-logo {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .ig-header-icons {
+      display: flex;
+      gap: 16px;
+      font-size: 18px;
+      align-items: center;
+    }
+
+    .ig-header-icons img {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .ig-stories {
+      display: flex;
+      gap: 14px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #1c1c1e;
+      overflow-x: auto;
+      background: #000;
+    }
+
+    .ig-story-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .ig-story-ring {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      padding: 2px;
+      background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      margin-bottom: 4px;
+    }
+
+    .ig-story-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid #000;
+      object-fit: cover;
+    }
+
+    .ig-feed {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 0;
+    }
+
+    .ig-post {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #1a1a1a;
+      padding-bottom: 12px;
+    }
+
+    .ig-post-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px 10px 12px;
+    }
+
+    .ig-post-user img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .ig-post-user span {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .ig-post-img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+
+    .ig-post-caption {
+      padding: 8px 12px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    #instagram-dm-screen {
+      padding: 0;
+      background: #000;
+      backdrop-filter: none;
+    }
+
+    .ig-dm-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid #1c1c1e;
+      background: #000;
+    }
+
+    .ig-dm-header button {
+      background: none; border: none; color: #3897f0; font-size: 18px; cursor: pointer;
+    }
+
+    /* Chat List & Chat Bubble */
+    .contact-item {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.12);
+      padding: 12px;
+      border-radius: 16px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .contact-avatar {
+      width: 48px; height: 48px; border-radius: 50%; margin-right: 12px; object-fit: cover;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .bubble {
+      max-width: 76%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 13px;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    .bubble.incoming {
+      background: rgba(44, 44, 46, 0.9);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .bubble.outgoing {
+      background: #0b84ff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-top: 6px;
+    }
+
+    .chat-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0 12px 12px 12px;
+    }
+
+    .choice-btn {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: white;
+      padding: 11px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 12px;
+      text-align: left;
+      backdrop-filter: blur(10px);
+    }
+
+    .choice-btn:hover { background: rgba(11, 132, 255, 0.7); }
+
+    /* Galeri Grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 14px;
+    }
+
+    /* Home Indicator iOS Bar */
+    .nav-bar {
+      height: 28px;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .home-indicator {
+      width: 130px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="iphone-frame">
+  
+  <!-- Dynamic Island Real iPhone -->
+  <div class="dynamic-island">
+    <div class="camera-lens"></div>
+    <div class="sensor-dot"></div>
+  </div>
+
+  <!-- Status Bar iPhone Presisi -->
+  <div class="status-bar">
+    <span>21:25</span>
+    <div class="status-icons">
+      <img src="918875130239756651-removebg-preview.png" alt="battery">
+    </div>
+  </div>
+
+  <!-- Screen Content Container -->
+  <div class="screen-content">
+    
+    <!-- 1. LOCK SCREEN VIEW (Password: 0506) -->
+    <div id="lock-screen" class="view active">
+      <div class="lock-widget">
+        <!-- Menggunakan file ikon lokal lock_icon.png -->
+        <div style="margin-bottom: 10px;"><img src="lock_icon.png" style="width:24px; height:24px;" alt="lock"></div>
+        <h2>Senin, 1 November</h2>
+        <h1>21:25</h1>
+      </div>
+
+      <div class="passcode-container">
+        <p style="font-size: 13px; color: rgba(255,255,255,0.8);">Masukkan Passcode </p>
+        <div class="passcode-dots">
+          <div class="dot" id="dot-0"></div>
+          <div class="dot" id="dot-1"></div>
+          <div class="dot" id="dot-2"></div>
+          <div class="dot" id="dot-3"></div>
+        </div>
+
+        <div class="numpad">
+          <button class="num-btn" onclick="pressNum('1')">1</button>
+          <button class="num-btn" onclick="pressNum('2')">2</button>
+          <button class="num-btn" onclick="pressNum('3')">3</button>
+          <button class="num-btn" onclick="pressNum('4')">4</button>
+          <button class="num-btn" onclick="pressNum('5')">5</button>
+          <button class="num-btn" onclick="pressNum('6')">6</button>
+          <button class="num-btn" onclick="pressNum('7')">7</button>
+          <button class="num-btn" onclick="pressNum('8')">8</button>
+          <button class="num-btn" onclick="pressNum('9')">9</button>
+          <button class="num-btn" style="visibility:hidden;"></button>
+          <button class="num-btn" onclick="pressNum('0')">0</button>
+          <button class="num-btn" onclick="clearPass()" style="font-size: 14px;">Del</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. HOME SCREEN -->
+    <div id="home-screen" class="view">
+      <div class="ios-widget">
+        <h2>Senin, 1 Nov</h2>
+        <h1>21:25</h1>
+      </div>
+
+      <div class="app-grid">
+        <!-- WhatsApp Icon -->
+        <div class="app-icon" onclick="switchApp('chat-list')">
+          <div class="icon-box">
+            <img src="tut.jpg" alt="WhatsApp">
+          </div>
+          <span>WhatsApp</span>
+        </div>
+
+        <!-- Instagram Icon -->
+        <div class="app-icon" onclick="switchApp('instagram')">
+          <div class="icon-box">
+            <img src="Hirono pfp.jpg" alt="Instagram">
+          </div>
+          <span>Instagram</span>
+        </div>
+
+        <!-- Galeri Icon -->
+        <div class="app-icon" onclick="switchApp('gallery')">
+          <div class="icon-box">
+            <img src="pov.jpg" alt="Galeri">
+          </div>
+          <span>Photos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. CHAT LIST (WhatsApp: Dina, Almerah, YJJA Group) -->
+    <div id="chat-list-screen" class="view">
+      <div class="app-header">
+        <button onclick="switchApp('home')">‹ Back</button>
+        <span>Chats</span>
+      </div>
+
+      <!-- Dina Chat -->
+      <div class="contact-item" onclick="openChat('dina')">
+        <img class="contact-avatar" src="dinaw.jpeg" alt="Dina">
+        <div>
+          <b>dinaauu 💖</b>
+          <p style="margin:2px 0 0; font-size:11px; color:#ccc;">lagi sama Hyun Wook nih...</p>
+        </div>
+      </div>
+
+      <!-- Almerah Chat -->
+      <div class="contact-item" onclick="openChat('almerah')">
+        <img class="contact-avatar" src="almerah.jpg" alt="Almerah">
+        <div>
+          <b>Almerah ✨</b>
+          <p style="margin:2px 0 0; font-size:11px; color:#ccc;">lagi sama Keonho nih...</p>
+        </div>
+      </div>
+
+      <!-- YJJA Group Chat -->
+      <div class="contact-item" onclick="openChat('yjja')">
+        <img class="contact-avatar" src="group_yjja.jpg" alt="YJJA Group">
+        <div>
+          <b>YJJA Group 🌟 (Dinau, Almerah, Ayna, Ayeesha, Abe, Syifa)</b>
+          <p style="margin:2px 0 0; font-size:11px; color:#ccc;">Ayeesha: yeebin nih bosss</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT DINA -->
+    <div id="chat-dina-screen" class="view">
+      <div class="app-header">
+        <button onclick="switchApp('chat-list')">‹ Chats</button>
+        <span>dinaauu 💖</span>
+      </div>
+      <div class="chat-messages" id="chat-box-dina"></div>
+      <div class="chat-choices" id="choices-dina"></div>
+    </div>
+
+    <!-- CHAT ALMERAH -->
+    <div id="chat-almerah-screen" class="view">
+      <div class="app-header">
+        <button onclick="switchApp('chat-list')">‹ Chats</button>
+        <span>Almerah ✨</span>
+      </div>
+      <div class="chat-messages" id="chat-box-almerah"></div>
+      <div class="chat-choices" id="choices-almerah"></div>
+    </div>
+
+    <!-- CHAT GROUP YJJA -->
+    <div id="chat-yjja-screen" class="view">
+      <div class="app-header">
+        <button onclick="switchApp('chat-list')">‹ Chats</button>
+        <span>YJJA Group 🌟</span>
+      </div>
+      <div class="chat-messages" id="chat-box-yjja"></div>
+      <div class="chat-choices" id="choices-yjja"></div>
+    </div>
+
+    <!-- TAMPILAN BERANDA INSTAGRAM -->
+    <div id="instagram-screen" class="view">
+      <div class="ig-header">
+        <span class="ig-logo">Instagram</span>
+        <div class="ig-header-icons">
+          <!-- Menggunakan ikon gambar lokal like_icon.png & dm_icon.png -->
+          <img src="like_icon.png" alt="Like">
+          <img src="Dm ícones gratuitos criados por Magnific.jpg" alt="DM" onclick="switchApp('instagram-dm')">
+        </div>
+      </div>
+
+      <!-- Story Bar -->
+      <div class="ig-stories">
+        <div class="ig-story-item" onclick="switchApp('instagram-dm')">
+          <div class="ig-story-ring">
+            <img class="ig-story-avatar" src="sejiwa.PNG" alt="Namjoo">
+          </div>
+          <span>sejiwacoffee</span>
+        </div>
+        <div class="ig-story-item">
+          <div class="ig-story-ring" style="background:#333;">
+            <img class="ig-story-avatar" src="dinaw.jpeg" alt="Dina">
+          </div>
+          <span>dinaauu</span>
+        </div>
+      </div>
+
+      <!-- Feed Instagram -->
+      <div class="ig-feed">
+        <div class="ig-post">
+          <div class="ig-post-user">
+            <img src="sejiwa.PNG" alt="Sejiwa">
+            <span>sejiwacoffee</span>
+          </div>
+          <img class="ig-post-img" src="sejiwa_post.jpg" alt="Sejiwa Post">
+          <div class="ig-post-caption">
+            <b>sejiwacoffee</b> Warm coffee for a cold day, Have a nice day.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAMPILAN DM CHAT INSTAGRAM (NAMJOO SEJIWA) -->
+    <div id="instagram-dm-screen" class="view">
+      <div class="ig-dm-header">
+        <button onclick="switchApp('instagram')">❮</button>
+        <span style="font-weight: 600;">sejiwacoffee</span>
+        <span style="width: 20px;"></span>
+      </div>
+      <div class="chat-messages" id="chat-box-sejiwa"></div>
+      <div class="chat-choices" id="choices-sejiwa"></div>
+    </div>
+
+    <!-- GALERI PHOTOS -->
+    <div id="gallery-screen" class="view">
+      <div class="app-header">
+        <button onclick="switchApp('home')">‹ Home</button>
+        <span>Album Foto</span>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="sejiwa_post.jpg" alt="Sejiwa Coffee">
+        </div>
+        <div class="gallery-item">
+          <img src="namjoo.jpg" alt="pap namjoo">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- iOS Home Bar -->
+  <div class="nav-bar" onclick="switchApp('home')">
+    <div class="home-indicator"></div>
+  </div>
+</div>
+
+<script>
+  // --- LOGIKA PASSWORD LOCKSCREEN ---
+  let enteredPass = "";
+  const correctPass = "0506";
+
+  function pressNum(num) {
+    if (enteredPass.length < 4) {
+      enteredPass += num;
+      updateDots();
+      if (enteredPass.length === 4) {
+        setTimeout(() => {
+          if (enteredPass === correctPass) {
+            switchApp('home');
+          } else {
+            alert("Passcode salah! Coba lagi (0506)");
+            clearPass();
+          }
+        }, 200);
+      }
+    }
+  }
+
+  function clearPass() {
+    enteredPass = "";
+    updateDots();
+  }
+
+  function updateDots() {
+    for (let i = 0; i < 4; i++) {
+      const dot = document.getElementById(`dot-${i}`);
+      if (i < enteredPass.length) {
+        dot.classList.add('filled');
+      } else {
+        dot.classList.remove('filled');
+      }
+    }
+  }
+
+  function switchApp(appName) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    
+    const targetScreen = document.getElementById(appName + '-screen');
+    if (targetScreen) {
+      targetScreen.classList.add('active');
+    }
+    
+    if(appName === 'chat-dina') loadDinaStory(1);
+    if(appName === 'chat-almerah') loadAlmerahChat(1);
+    if(appName === 'chat-yjja') loadYjjaChat(1);
+    if(appName === 'instagram-dm') startSejiwaChat();
+  }
+
+  function openChat(person) {
+    if(person === 'dina') switchApp('chat-dina');
+    if(person === 'almerah') switchApp('chat-almerah');
+    if(person === 'yjja') switchApp('chat-yjja');
+  }
+
+  // --- ALUR CERITA DINA ---
+  const dinaStory = {
+    1: { sender: 'outgoing', text: "dinaau, main yu bosen banget gua pgn main.", next: 2 },
+    2: { sender: 'incoming', text: "duhh jaay, gua lagi nemenin pacar gua lagii", next: 3 },
+    3: { sender: 'incoming', text: "nih bocahnya lg syuing 📸", img: "hyunwook.jpg", next: 4 },
+    4: { sender: 'incoming', text: "tarr gua nyusul dahh sm pacar gua tp hehe kabarin aja dimana", choices: [{ text: "yauda, gua pgn ke Sejiwa aja dah, dateng lu awas aja", next: 5 }] },
+    5: { sender: 'outgoing', text: "DINN WOYY DMNN", choices: [{text: "masa tbtb ada barista ngasih Matcha Latte pdhl gua ga pesen anjr?? mana ceremonial lagi", next: 6 }] },
+    6: { sender: 'incoming', text: "HAHHH SUMPAHH?? cieee majayyy sama barista ya skrg wkwkw, btw gua otw yakk", choices: [{ text: "anjir lahh, yauda sini hati hati", next: 7 }] },
+    7: { sender: 'outgoing', text: "gua pgn stalk akun sejiwa ah hehehhehe", choices: [] }
+  };
+
+  function loadDinaStory(stepId) {
+    const box = document.getElementById('chat-box-dina');
+    const choices = document.getElementById('choices-dina');
+    if(stepId === 1) box.innerHTML = '';
+
+    const step = dinaStory[stepId];
+    if(!step) return;
+
+    addBubble(box, step.sender, step.text, step.img);
+
+    choices.innerHTML = '';
+    if(step.choices && step.choices.length > 0) {
+      step.choices.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerText = c.text;
+        btn.onclick = () => {
+          addBubble(box, 'outgoing', c.text);
+          choices.innerHTML = '';
+          setTimeout(() => loadDinaStory(c.next), 800);
+        };
+        choices.appendChild(btn);
+      });
+    } else if(step.next) {
+      setTimeout(() => loadDinaStory(step.next), 1000);
+    }
+  }
+
+  // --- ALUR CHAT ALMERAH ---
+  const almerahChatData = {
+    1: { sender: 'incoming', text: "jaayy sumpah ya kita udah lama banget gak ketemu jir semenjak lulus, kemana aja lu?!", next: 2 },
+    2: { sender: 'outgoing', text: "ehh amimirr, iya nih sibuk banget biasa anak arsi, kapan main mir?", next: 3 },
+    3: { sender: 'incoming', text: "kangen dah main sama yjja lagi, eh tau gak, gua kayanya naksir anak FTMD deh lu kenal gak?", choices: [{ text: "kenall banyak jgn jgn si ken lagi??.", next: 4 }] },
+    4: { sender: 'incoming', text: "AHHAHAHA tauu aja, minta ignya dongg", choices: [{text: "yahh kirain ngechat beneran kangen ternyata ada maunya", next: 5 }] },
+    5: { sender: 'outgoing', text: "inii mir ignya, @keonho._", next: 6},
+    6: { sender: 'incoming', text: "hehehe berjoking aja jay, makasi yaak"}
+  };
+
+  function loadAlmerahChat(stepId) {
+    const box = document.getElementById('chat-box-almerah');
+    const choices = document.getElementById('choices-almerah');
+    if(stepId === 1) box.innerHTML = '';
+
+    const step = almerahChatData[stepId];
+    if(!step) return;
+
+    addBubble(box, step.sender, step.text);
+
+    choices.innerHTML = '';
+    if(step.choices && step.choices.length > 0) {
+      step.choices.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerText = c.text;
+        btn.onclick = () => {
+          addBubble(box, 'outgoing', c.text);
+          choices.innerHTML = '';
+          setTimeout(() => loadAlmerahChat(c.next), 800);
+        };
+        choices.appendChild(btn);
+      });
+    } else if(step.next) {
+      setTimeout(() => loadAlmerahChat(step.next), 1000);
+    }
+  }
+
+  // --- ALUR GRUP YJJA ---
+  const yjjaChatData = {
+    1: { sender: 'incoming', name: 'Ayeesha', text: "Gue liat-liat ni grup adem banget, padahal aslinya bucin semua[cite: 1] wkwk", next: 2 },
+    2: { sender: 'incoming', name: 'Ayna', text: "Emang boleh ya se-bucin itu tiap hari? Iri tau liat yang pada jadian[cite: 1] 👀", next: 3 },
+    3: { sender: 'incoming', name: 'Abe', text: "Makanya cari pasangan dong Na, jangan melongo aja lu wkwk", next: 4 },
+    4: { sender: 'incoming', name: 'Syifa', text: "Udah-udah jangan pada ngajak ribut. Si Jay nih tumben diem aja, lagi bucin juga ya lo?", choices: [{ text: "Mana ada! Gua jomblo paling santai ya di sini[cite: 1]", next: 5 }] },
+    5: { sender: 'incoming', name: 'Almerah', text: "Halah ngeles teros si Jay padahal abis dari Sejiwa☕", choices: [{ text: "Wah pada nyimak ya kalian ni (-__-)", next: 6 }] },
+    6: { sender: 'incoming', name: 'Dinau', text: "Hahaha ketauan kan lu Jay! Intinya langgeng deh buat yang udah jadian di grup ini[cite: 1] ✨", choices: [] }
+  };
+
+  function loadYjjaChat(stepId) {
+    const box = document.getElementById('chat-box-yjja');
+    const choices = document.getElementById('choices-yjja');
+    if(stepId === 1) box.innerHTML = '';
+
+    const step = yjjaChatData[stepId];
+    if(!step) return;
+
+    const senderName = step.sender === 'incoming' ? `<b style="color:#0a84ff; display:block; font-size:11px; margin-bottom:2px;">${step.name}</b>` : '';
+    const bubble = document.createElement('div');
+    bubble.className = `bubble ${step.sender}`;
+    bubble.innerHTML = senderName + step.text;
+    box.appendChild(bubble);
+    box.scrollTop = box.scrollHeight;
+
+    choices.innerHTML = '';
+    if(step.choices && step.choices.length > 0) {
+      step.choices.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerText = c.text;
+        btn.onclick = () => {
+          addBubble(box, 'outgoing', c.text);
+          choices.innerHTML = '';
+          setTimeout(() => loadYjjaChat(c.next), 800);
+        };
+        choices.appendChild(btn);
+      });
+    } else if(step.next) {
+      setTimeout(() => loadYjjaChat(step.next), 1200);
+    }
+  }
+
+  // --- ALUR CERITA INSTAGRAM SEJIWA (NAMJOO) ---
+  const sejiwaStory = {
+    1: { sender: 'outgoing', text: "haloo min, mau bilang makasih banget yaa tadi buat barista yang udah ngasih free Matcha Latte padahal aku ga pesen hehe", next: 2 },
+    2: { sender: 'incoming', text: "sama samaaa kakakk cantikkk", next: 3 },
+    3: { sender: 'incoming', text: "kenalin aku namjooo lanjut dm ig aja ya kakakkk @namjoo", img: "namjoo.jpg", choices: [{ text: "EH KAGET WKWKW haii namjoo, salam kenal ya! makasi buat matchanya", next: 4 }] },
+    4: { sender: 'incoming', text: "salam kenal juga kakakk! jangan lupa follback ig aku yaa kakakk cantikk", choices: [] }
+  };
+
+  function startSejiwaChat() {
+    loadSejiwaStory(1);
+  }
+
+  function loadSejiwaStory(stepId) {
+    const box = document.getElementById('chat-box-sejiwa');
+    const choices = document.getElementById('choices-sejiwa');
+    if(stepId === 1) box.innerHTML = '';
+
+    const step = sejiwaStory[stepId];
+    if(!step) return;
+
+    addBubble(box, step.sender, step.text, step.img);
+
+    choices.innerHTML = '';
+    if(step.choices && step.choices.length > 0) {
+      step.choices.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerText = c.text;
+        btn.onclick = () => {
+          addBubble(box, 'outgoing', c.text);
+          choices.innerHTML = '';
+          setTimeout(() => loadSejiwaStory(c.next), 800);
+        };
+        choices.appendChild(btn);
+      });
+    } else if(step.next) {
+      setTimeout(() => loadSejiwaStory(step.next), 1000);
+    }
+  }
+
+  function addBubble(container, type, text, imgUrl) {
+    const bubble = document.createElement('div');
+    bubble.className = `bubble ${type}`;
+    bubble.innerText = text;
+    if(imgUrl) {
+      const img = document.createElement('img');
+      img.src = imgUrl;
+      bubble.appendChild(img);
+    }
+    container.appendChild(bubble);
+    container.scrollTop = container.scrollHeight;
+  }
+</script>
+
+</body>
+</html>
